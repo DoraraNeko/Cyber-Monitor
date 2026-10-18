@@ -177,6 +177,10 @@ Progman に `0x052C` を送って WorkerW を生成させ、ウィンドウを�
 - ネットワークの遅延表示のため、5 秒ごとに `1.1.1.1` へ PING を送ります
 - Cyber Board の画面は、フォントを Google Fonts から読み込みます（オフライン時は Windows のフォントで表示）
 
+## ライセンス
+
+[MIT](LICENSE)
+
 ## クレジット
 
 - 猫のドット絵: [Catbar](https://github.com/DoraraNeko/Catbar)（MIT License。`renderer/cat/LICENSE`）

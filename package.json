@@ -4,6 +4,7 @@
   "description": "Performance Monitor と Cyber Board をモニターごとに壁紙表示する統合版",
   "main": "src/main.js",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "start": "electron .",
     "window": "electron . --window",
