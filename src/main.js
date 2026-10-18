@@ -25,7 +25,9 @@ const CAPTURE_TASK = process.argv.find((a) => a.startsWith('--capture-task='))?.
 const SIMULATE_CLICK = process.argv.find((a) => a.startsWith('--simulate-click='))?.slice(17); // デバッグ用: "x,y"（物理ピクセル）
 const CAT_DEMO = process.argv.includes('--cat-demo'); // デバッグ用: 猫が数秒ごとにしゃべる・伸びる
 const CAT_LINE = process.argv.find((a) => a.startsWith('--cat-line='))?.slice(11); // デバッグ用: セリフを固定
-const CAPTURE_DELAY = Number(process.argv.find((a) => a.startsWith('--capture-delay='))?.slice(16)) || 8000;
+// デバッグ用: キャプチャするまでの時間（ミリ秒）。"9000,13000" のように複数指定すると <prefix>-<モニター番号>-<種類>-<時間>.png に保存
+const CAPTURE_DELAYS = (process.argv.find((a) => a.startsWith('--capture-delay='))?.slice(16) || '8000').split(',').map(Number).filter((n) => n > 0);
+const ANONYMIZE = process.argv.includes('--anonymize'); // スクリーンショット用: PC 名・Wi-Fi 名・IP アドレスを仮の値にする
 const CAT_ON = process.argv.find((a) => a.startsWith('--cat-on='))?.slice(9); // デバッグ用: 猫を perf / board の上だけに出す
 
 // モニターに割り当てる表示
@@ -239,7 +241,9 @@ function createWallpaper(display, role, index) {
     win.loadFile(path.join(ROOT, 'renderer', 'perf', 'index.html'));
     win.webContents.on('did-finish-load', () => sendPerfInit(win, display));
   }
-  if (CAPTURE) capture(win, `${CAPTURE}-${index + 1}-${role}.png`, CAPTURE_DELAY);
+  if (CAPTURE) {
+    for (const d of CAPTURE_DELAYS) capture(win, `${CAPTURE}-${index + 1}-${role}${CAPTURE_DELAYS.length > 1 ? `-${d}` : ''}.png`, d);
+  }
   win.once('ready-to-show', () => {
     if (WINDOW_MODE) { win.show(); return; }
     win.showInactive();
@@ -310,7 +314,7 @@ function ensurePerf() {
       busy = true;
       try {
         p.lastMetrics = await p.system.sample();
-        broadcastPerf('metrics', p.lastMetrics);
+        broadcastPerf('metrics', ANONYMIZE ? anonymizeMetrics(p.lastMetrics) : p.lastMetrics);
       } catch (e) { console.error(e); }
       busy = false;
     }, 1000));
@@ -343,8 +347,22 @@ async function sendPerfInit(win, display) {
   const p = ensurePerf();
   await p.ready;
   if (win.isDestroyed() || perf !== p) return;
-  win.webContents.send('init', { config: perfRendererConfig(display), static: p.system.static });
+  const st = ANONYMIZE ? { ...p.system.static, hostname: 'CYBER-PC' } : p.system.static;
+  win.webContents.send('init', { config: perfRendererConfig(display), static: st });
   if (p.lastClaude) win.webContents.send('claude', p.lastClaude);
+}
+
+// --anonymize: 画面に出る個人を特定しうる値を仮の値にする
+function anonymizeMetrics(m) {
+  const net = m.net || {};
+  return {
+    ...m,
+    net: {
+      ...net,
+      iface: net.iface && { ...net.iface, name: 'Ethernet', ip: '192.168.0.10' },
+      wifi: net.wifi && { ...net.wifi, ssid: 'NEON-NET', adapter: 'Wi-Fi' },
+    },
+  };
 }
 
 function restartPerf() {
