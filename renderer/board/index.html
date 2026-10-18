@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
+
+  <header class="toolbar">
+    <button class="btn btn-primary" id="btn-new" title="新しいタスク (N)"><span class="plus">+</span> NEW TASK</button>
+    <div class="search">
+      <span class="search-icon">⌕</span>
+      <input id="search" placeholder="検索 (タイトル・メモ・タグ)" autocomplete="off">
+    </div>
+    <label class="check"><input type="checkbox" id="chk-done" checked><span></span> 完了も表示</label>
+    <button class="btn" id="btn-clear">完了済みを削除</button>
+    <span class="toolbar-hint">クリックで編集 ・ ドラッグで移動 ・ N で追加</span>
+  </header>
+
+  <main class="hud" id="hud">
+    <section class="topbar frame">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+          <polygon points="24,3 42,13.5 42,34.5 24,45 6,34.5 6,13.5" class="logo-hex"/>
+          <polygon points="24,12 33,17 33,31 24,36 15,31 15,17" class="logo-inner"/>
+          <circle cx="24" cy="24" r="3.4" class="logo-core"/>
+        </svg>
+        <div>
+          <h1 id="title">CYBER//BOARD</h1>
+          <p>TASK OPERATIONS INTERFACE <span class="ver">v1.0</span></p>
+        </div>
+      </div>
+      <div class="sys">
+        <div class="chip"><i class="led"></i>SYSTEM ONLINE</div>
+        <div class="chip mono" id="chip-sync">SYNC --:--</div>
+        <div class="legend" id="legend" title="枠の色 = 期日までの余裕"></div>
+        <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="clock">
+        <div class="time" id="time">00:00<span>:00</span></div>
+        <div class="date" id="date">----.--.-- ---</div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="frame panel stats">
+        <h2><span class="idx">A</span>STATUS</h2>
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="56" class="ring-ticks"/>
+            <circle cx="60" cy="60" r="47" class="ring-track"/>
+            <circle cx="60" cy="60" r="47" class="ring-fill" id="ring-fill"/>
+            <circle cx="60" cy="60" r="38" class="ring-inner"/>
+          </svg>
+          <div class="ring-label"><b id="ring-pct">0</b><span>%</span><small>COMPLETE</small></div>
+        </div>
+        <div class="counts" id="counts"></div>
+      </section>
+      <section class="frame panel prio-panel">
+        <h2><span class="idx">B</span>PRIORITY LOAD</h2>
+        <div id="prio-bars"></div>
+      </section>
+      <section class="frame panel upcoming">
+        <h2><span class="idx">C</span>DEADLINES</h2>
+        <ul id="upcoming"></ul>
+      </section>
+    </aside>
+
+    <section class="columns" id="columns"></section>
+
+    <footer class="ticker frame">
+      <span class="ticker-tag">LOG</span>
+      <div class="ticker-view"><div class="ticker-track" id="ticker"></div></div>
+    </footer>
+  </main>
+
+  <dialog class="dialog" id="dialog">
+    <form method="dialog" id="form">
+      <div class="dialog-head">
+        <span class="dialog-id" id="dialog-id">CB-000</span>
+        <h2 id="dialog-title">NEW TASK</h2>
+      </div>
+      <label class="field">
+        <span>TITLE / タイトル</span>
+        <input name="title" required maxlength="80" placeholder="例: 月次レポートの作成" autocomplete="off">
+      </label>
+      <label class="field">
+        <span>NOTES / メモ</span>
+        <textarea name="notes" rows="3" maxlength="600" placeholder="詳細・メモ"></textarea>
+      </label>
+      <div class="field-row">
+        <div class="field">
+          <span>STATUS / 状態</span>
+          <div class="picker" id="status-picker"></div>
+        </div>
+        <label class="field">
+          <span>DUE / 期限</span>
+          <input type="date" name="due">
+        </label>
+      </div>
+      <div class="field">
+        <span>PRIORITY / 優先度</span>
+        <div class="picker" id="prio-picker"></div>
+      </div>
+      <label class="field">
+        <span>TAGS / タグ（スペースかカンマ区切り）</span>
+        <input name="tags" maxlength="120" placeholder="例: work report" autocomplete="off">
+      </label>
+      <div class="field">
+        <span>SUBTASKS / サブタスク</span>
+        <ul class="subtask-edit" id="subtask-edit"></ul>
+        <div class="subtask-add">
+          <input id="subtask-input" maxlength="80" placeholder="サブタスクを追加して Enter" autocomplete="off">
+          <button type="button" class="btn btn-small" id="subtask-add">ADD</button>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-danger" id="btn-delete">DELETE</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" id="btn-cancel">CANCEL</button>
+        <button type="submit" class="btn btn-primary" value="save">SAVE</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="bg.js"></script>
+  <script src="board.js"></script>
+  <script src="../cat/cat.js" data-surfaces=".topbar, .side > .panel, .ticker" data-floors=".columns > .column" data-obstacles=".col-head, .card, .more"></script>
+</body>
+</html>

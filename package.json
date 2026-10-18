@@ -1,0 +1,21 @@
+{
+  "name": "cyber-monitor",
+  "version": "1.0.0",
+  "description": "Performance Monitor と Cyber Board をモニターごとに壁紙表示する統合版",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "window": "electron . --window",
+    "edit": "electron . --edit",
+    "icon": "electron tools/build-icon.js",
+    "launcher": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-launcher.ps1",
+    "shortcut": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/make-shortcut.ps1"
+  },
+  "dependencies": {
+    "systeminformation": "^5.27.7"
+  },
+  "devDependencies": {
+    "electron": "^37.10.3"
+  }
+}

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file: data:; style-src 'self' 'unsafe-inline'">
+  <title>Desktop Viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="layout-right">
+  <div id="bg"></div>
+  <div id="bg-grid"></div>
+  <div id="bg-glow"></div>
+
+  <div id="stage">
+    <header id="topbar">
+      <div class="brand"><i class="hex"></i><b>SYS</b>.MONITOR <span class="dim">// <span id="host">—</span></span></div>
+      <div class="bar-fill"></div>
+      <div class="meta"><span class="dim">OS</span> <span id="os">—</span></div>
+      <div class="meta"><span class="dim">UPTIME</span> <span id="uptime">—</span></div>
+      <div class="meta status"><i class="led"></i><span id="status">ONLINE</span></div>
+    </header>
+
+    <section id="clock">
+      <div class="time"><span id="hhmm">--:--</span><span id="ss">--</span></div>
+      <div class="date"><span id="date">----.--.--</span><span class="dow" id="dow">---</span></div>
+      <div class="ticker"><span class="dim">LOAD</span> <span id="sum-load">—</span>
+        <span class="sep">/</span><span class="dim">MEM</span> <span id="sum-mem">—</span>
+        <span class="sep">/</span><span class="dim">GPU</span> <span id="sum-gpu">—</span>
+        <span class="sep">/</span><span class="dim">PING</span> <span id="sum-ping">—</span></div>
+    </section>
+
+    <main id="grid">
+      <!-- CPU -->
+      <article class="panel" id="p-cpu">
+        <div class="ph"><span class="no">01</span><h2>CPU</h2><span class="sub" id="cpu-name">—</span><i class="led"></i></div>
+        <div class="pb">
+          <div class="gauge-wrap"><canvas class="gauge" id="g-cpu"></canvas></div>
+          <div class="side">
+            <canvas class="chart" id="c-cpu"></canvas>
+            <dl class="stats">
+              <div><dt>CORES</dt><dd id="cpu-cores">—</dd></div>
+              <div><dt>FREQ</dt><dd id="cpu-freq">—</dd></div>
+              <div><dt>PEAK CORE</dt><dd id="cpu-peak">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <canvas class="cores" id="c-cores"></canvas>
+      </article>
+
+      <!-- GPU -->
+      <article class="panel" id="p-gpu">
+        <div class="ph"><span class="no">02</span><h2>GPU</h2><span class="sub" id="gpu-name">—</span><i class="led"></i></div>
+        <div class="pb">
+          <div class="gauge-wrap"><canvas class="gauge" id="g-gpu"></canvas></div>
+          <div class="side">
+            <canvas class="chart" id="c-gpu"></canvas>
+            <dl class="stats">
+              <div><dt>TEMP</dt><dd id="gpu-temp">—</dd></div>
+              <div><dt>CLOCK</dt><dd id="gpu-clock">—</dd></div>
+              <div><dt>FAN</dt><dd id="gpu-fan">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="meter"><span class="ml">VRAM</span><div class="track"><i id="gpu-vram-bar"></i></div><span class="mv" id="gpu-vram">—</span></div>
+      </article>
+
+      <!-- MEMORY -->
+      <article class="panel" id="p-mem">
+        <div class="ph"><span class="no">03</span><h2>MEMORY</h2><span class="sub" id="mem-total">—</span><i class="led"></i></div>
+        <div class="pb">
+          <div class="gauge-wrap"><canvas class="gauge" id="g-mem"></canvas></div>
+          <div class="side">
+            <canvas class="chart" id="c-mem"></canvas>
+            <dl class="stats">
+              <div><dt>IN USE</dt><dd id="mem-used">—</dd></div>
+              <div><dt>AVAILABLE</dt><dd id="mem-avail">—</dd></div>
+              <div><dt>PAGEFILE</dt><dd id="mem-swap">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="meter"><span class="ml">COMMIT</span><div class="track"><i id="mem-bar"></i></div><span class="mv" id="mem-pct">—</span></div>
+      </article>
+
+      <!-- DISK -->
+      <article class="panel" id="p-disk">
+        <div class="ph"><span class="no">04</span><h2>STORAGE</h2><span class="sub">PHYSICAL DISK I/O</span><i class="led"></i></div>
+        <div class="pb">
+          <div class="gauge-wrap"><canvas class="gauge" id="g-disk"></canvas></div>
+          <div class="side">
+            <canvas class="chart" id="c-disk"></canvas>
+            <dl class="stats">
+              <div><dt class="c-a">▲ READ</dt><dd id="disk-read">—</dd></div>
+              <div><dt class="c-b">▼ WRITE</dt><dd id="disk-write">—</dd></div>
+              <div><dt>QUEUE</dt><dd id="disk-queue">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div id="drives"></div>
+      </article>
+
+      <!-- NETWORK -->
+      <article class="panel" id="p-net">
+        <div class="ph"><span class="no">05</span><h2>NETWORK</h2><span class="sub" id="net-ssid">—</span><i class="led"></i></div>
+        <div class="pb">
+          <div class="gauge-wrap"><canvas class="gauge" id="g-wifi"></canvas></div>
+          <div class="side">
+            <canvas class="chart" id="c-net"></canvas>
+            <dl class="stats">
+              <div><dt class="c-a">▼ DOWN</dt><dd id="net-rx">—</dd></div>
+              <div><dt class="c-b">▲ UP</dt><dd id="net-tx">—</dd></div>
+              <div><dt>PING</dt><dd id="net-ping">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="kv-row">
+          <span><em>LINK</em><b id="net-link">—</b></span>
+          <span><em>BAND</em><b id="net-band">—</b></span>
+          <span><em>STD</em><b id="net-std">—</b></span>
+          <span><em>IP</em><b id="net-ip">—</b></span>
+        </div>
+      </article>
+
+      <!-- CLAUDE -->
+      <article class="panel" id="p-claude">
+        <div class="ph"><span class="no">06</span><h2>CLAUDE</h2><span class="sub">CODE USAGE // 5H WINDOW</span><i class="led"></i></div>
+        <div class="pb">
+          <div class="gauge-wrap"><canvas class="gauge" id="g-claude"></canvas></div>
+          <div class="side">
+            <canvas class="chart bars" id="c-claude"></canvas>
+            <dl class="stats">
+              <div><dt>RESET IN</dt><dd id="cl-reset">—</dd></div>
+              <div><dt>BURN</dt><dd id="cl-burn">—</dd></div>
+              <div><dt>TODAY</dt><dd id="cl-today">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="kv-row">
+          <span><em>IN</em><b id="cl-in">—</b></span>
+          <span><em>OUT</em><b id="cl-out">—</b></span>
+          <span><em>CACHE</em><b id="cl-cache">—</b></span>
+          <span><em>MODEL</em><b id="cl-model">—</b></span>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script src="widgets.js"></script>
+  <script src="app.js"></script>
+  <script src="../cat/cat.js" data-surfaces="#topbar, #clock .time, #clock .date, #grid > .panel"></script>
+</body>
+</html>

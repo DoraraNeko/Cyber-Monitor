@@ -1,0 +1,42 @@
+{
+  "screens": {},
+  "board": {
+    "layout": "center",
+    "boardWidth": 0.84,
+    "boardHeight": 0.88,
+    "hideCompletedAfterDays": 3,
+    "editorShortcut": "Control+Alt+B",
+    "ambient": true,
+    "fps": 30,
+    "accent": "#00f0ff",
+    "accent2": "#ff2bd6",
+    "title": "CYBER//BOARD",
+    "clickModifier": "Alt"
+  },
+  "perf": {
+    "layout": "right",
+    "fps": 20,
+    "accent": "#38f6ff",
+    "accent2": "#ff3df0",
+    "backgroundImage": "",
+    "backgroundDim": 0.55,
+    "historySeconds": 120,
+    "gpu": {
+      "source": "auto"
+    },
+    "claude": {
+      "enabled": true,
+      "projectsDir": "",
+      "tokenLimit5h": 0,
+      "refreshSeconds": 30
+    }
+  },
+  "cat": {
+    "enabled": true,
+    "breed": "white",
+    "scale": 3,
+    "actionMinutes": 3,
+    "moveMinutes": 60,
+    "sleepChance": 0.2
+  }
+}

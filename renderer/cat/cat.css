@@ -1,0 +1,101 @@
+/* 壁紙の上に座る猫（Catbar の catbar.css をもとに） */
+.cm-cat {
+  position: fixed;
+  z-index: 9000;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.8));
+  transition: opacity 0.6s;
+}
+.cm-cat[hidden] { display: none !important; }
+/* 黒い部分がある猫は、暗い壁紙でも見えるよう明るい縁取りにする */
+.cm-cat[data-breed="black"],
+.cm-cat[data-breed="hachiware"] {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.75)) drop-shadow(0 0 6px rgba(0, 240, 255, 0.25));
+}
+
+.cm-cat > div:not(.cm-bubble),
+.cm-upper > div {
+  position: absolute;
+  top: 0;
+  image-rendering: pixelated;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.cm-lower { background-image: var(--cm-img-lower); }
+.cm-body {
+  background-image: var(--cm-img-body);
+  background-repeat: repeat-x !important;
+  background-position: left top;
+}
+.cm-cat[data-face="normal"] .cm-upper { background-image: var(--cm-img-normal); }
+.cm-cat[data-face="wide"] .cm-upper { background-image: var(--cm-img-wide); }
+.cm-cat[data-face="closed"] .cm-upper { background-image: var(--cm-img-closed); }
+
+/* 眠っているときの Zzz（頭の左上でふわふわ） */
+.cm-zzz { display: none; background-image: var(--cm-img-zzz); }
+.cm-cat[data-sleep="1"] .cm-zzz {
+  display: block;
+  animation: cm-float 1.6s steps(4) infinite;
+}
+@keyframes cm-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+/* びっくりしたときに 2 回はねる */
+.cm-cat.cm-hop { animation: cm-hop 0.42s steps(4) 2; }
+@keyframes cm-hop {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -14px; }
+}
+
+/* セリフの吹き出し: HUD に合わせた暗い地に発光する枠 */
+.cm-bubble {
+  position: absolute;
+  width: max-content;
+  max-width: 340px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--accent, #00f0ff);
+  border-radius: 10px 10px 10px 0;
+  background: rgba(4, 12, 22, 0.92);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent, #00f0ff) 45%, transparent), inset 0 0 10px rgba(0, 240, 255, 0.08);
+  color: #e8fbff;
+  font: 700 15px/1.5 "Zen Kaku Gothic New", "BIZ UDPGothic", "Yu Gothic UI", Meiryo, sans-serif;
+  letter-spacing: 0.02em;
+  white-space: pre-line;
+  animation: cm-pop 0.22s steps(3);
+}
+/* ナレーション風のセリフ（＊ ではじまる）: 黒地に白い枠のテキストボックス */
+.cm-bubble.cm-narr {
+  border: 3px solid #fff;
+  border-radius: 0;
+  background: #000;
+  box-shadow: none;
+  color: #fff;
+  font: 400 15px/1.7 "BIZ UDGothic", "MS Gothic", "Share Tech Mono", monospace;
+  letter-spacing: 0.06em;
+  max-width: 440px;
+}
+.cm-bubble.cm-narr::after { display: none; }
+.cm-bubble[hidden] { display: none; }
+.cm-bubble.cm-flip { border-radius: 10px 10px 0 10px; }
+.cm-bubble.cm-narr.cm-flip { border-radius: 0; }
+.cm-bubble::after {
+  content: "";
+  position: absolute;
+  left: -1.5px;
+  bottom: -9px;
+  border-style: solid;
+  border-width: 9px 9px 0 0;
+  border-color: var(--accent, #00f0ff) transparent transparent transparent;
+}
+.cm-bubble.cm-flip::after {
+  left: auto;
+  right: -1.5px;
+  border-width: 9px 0 0 9px;
+}
+@keyframes cm-pop {
+  from { opacity: 0; translate: 0 6px; }
+  to { opacity: 1; translate: 0 0; }
+}

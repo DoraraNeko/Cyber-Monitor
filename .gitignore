@@ -1,0 +1,23 @@
+# 依存パッケージ
+node_modules/
+
+# 個人のデータ（タスク）。初回起動時にサンプルが作られる
+data/
+
+# 配布物・ビルド成果物（Cyber Monitor.exe は npm run launcher で作る / リリースの zip に同梱）
+dist/
+*.zip
+*.exe
+
+# 手元の環境の絶対パスを含むショートカット
+*.lnk
+
+# 一時ファイル
+*.tmp
+
+# OS・エディタ
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
